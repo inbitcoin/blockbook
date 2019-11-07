@@ -96,6 +96,7 @@ var (
 	internalState              *common.InternalState
 	callbacksOnNewBlock        []bchain.OnNewBlockFunc
 	callbacksOnNewTxAddr       []bchain.OnNewTxAddrFunc
+	callbacksOnNewTx           []bchain.OnNewTxFunc
 	chanOsSignal               chan os.Signal
 	inShutdown                 int32
 )
@@ -274,7 +275,7 @@ func mainWithExitCode() int {
 		if chain.GetChainParser().GetChainType() == bchain.ChainBitcoinType {
 			addrDescForOutpoint = index.AddrDescForOutpoint
 		}
-		err = chain.InitializeMempool(addrDescForOutpoint, onNewTxAddr)
+		err = chain.InitializeMempool(addrDescForOutpoint, onNewTxAddr, onNewTx)
 		if err != nil {
 			glog.Error("initializeMempool ", err)
 			return exitCodeFatal
@@ -295,6 +296,7 @@ func mainWithExitCode() int {
 		// start full public interface
 		callbacksOnNewBlock = append(callbacksOnNewBlock, publicServer.OnNewBlock)
 		callbacksOnNewTxAddr = append(callbacksOnNewTxAddr, publicServer.OnNewTxAddr)
+		callbacksOnNewTx = append(callbacksOnNewTx, publicServer.OnNewTx)
 		publicServer.ConnectFullPublicInterface()
 	}
 
@@ -583,6 +585,12 @@ func storeInternalStateLoop() {
 func onNewTxAddr(tx *bchain.Tx, desc bchain.AddressDescriptor) {
 	for _, c := range callbacksOnNewTxAddr {
 		c(tx, desc)
+	}
+}
+
+func onNewTx(tx string) {
+	for _, c := range callbacksOnNewTx {
+		c(tx)
 	}
 }
 

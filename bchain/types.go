@@ -201,6 +201,9 @@ type OnNewBlockFunc func(hash string, height uint32)
 // OnNewTxAddrFunc is used to send notification about a new transaction/address
 type OnNewTxAddrFunc func(tx *Tx, desc AddressDescriptor)
 
+// OnNewTxFunc is used to send notification about a new transaction
+type OnNewTxFunc func(tx string)
+
 // AddrDescForOutpointFunc defines function that returns address descriptorfor given outpoint or nil if outpoint not found
 type AddrDescForOutpointFunc func(outpoint Outpoint) AddressDescriptor
 
@@ -212,7 +215,7 @@ type BlockChain interface {
 	// create mempool but do not initialize it
 	CreateMempool(BlockChain) (Mempool, error)
 	// initialize mempool, create ZeroMQ (or other) subscription
-	InitializeMempool(AddrDescForOutpointFunc, OnNewTxAddrFunc) error
+	InitializeMempool(AddrDescForOutpointFunc, OnNewTxAddrFunc, OnNewTxFunc) error
 	// shutdown mempool, ZeroMQ and block chain connections
 	Shutdown(ctx context.Context) error
 	// chain info
