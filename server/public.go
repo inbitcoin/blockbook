@@ -216,6 +216,12 @@ func (s *PublicServer) OnNewTxAddr(tx *bchain.Tx, desc bchain.AddressDescriptor)
 	s.websocket.OnNewTxAddr(tx, desc)
 }
 
+// OnNewTxCoin notifies users subscribed to bitcoind/addresstxid about new block
+func (s *PublicServer) OnNewTxCoin(tx *bchain.Tx, value big.Int, desc bchain.AddressDescriptor) {
+	s.socketio.OnNewTxCoin(tx.Txid, value, desc)
+	//s.websocket.OnNewTxAddr(tx, desc)
+}
+
 // OnNewTx notifies users subscribed to bitcoind/txid about new transaction
 func (s *PublicServer) OnNewTx(txid string) {
 	s.socketio.OnNewTx(txid)

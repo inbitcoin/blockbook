@@ -99,6 +99,9 @@ func (m *MempoolBitcoinType) getTxAddrs(txid string, chanInput chan Outpoint, ch
 		if m.OnNewTxAddr != nil {
 			m.OnNewTxAddr(tx, addrDesc)
 		}
+		if m.OnNewTxCoin != nil {
+			m.OnNewTxCoin(tx, output.ValueSat, addrDesc)
+		}
 	}
 	dispatched := 0
 	for _, input := range tx.Vin {

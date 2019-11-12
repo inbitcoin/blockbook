@@ -704,8 +704,8 @@ func (s *SocketIoServer) onSubscribe(c *gosocketio.Channel, req []byte) interfac
 		}
 	} else {
 		sc = r[1 : len(r)-1]
-		if sc != "bitcoind/hashblock" && sc != "bitcoind/txid" {
-			onError(c.Id(), sc, "invalid data", "expecting bitcoind/hashblock or bitcoind/txid, req: "+r)
+		if sc != "bitcoind/hashblock" && sc != "bitcoind/txid" && sc != "bitcoind/coin" {
+			onError(c.Id(), sc, "invalid data", "expecting bitcoind/hashblock or bitcoind/txid or bitcoind/coin, req: "+r)
 			return nil
 		}
 		c.Join(sc)
@@ -731,6 +731,18 @@ func (s *SocketIoServer) OnNewTxAddr(txid string, desc bchain.AddressDescriptor)
 		if c > 0 {
 			glog.Info("broadcasting new txid ", txid, " for addr ", addr[0], " to ", c, " channels")
 		}
+	}
+}
+
+// OnNewTxCoin notifies users subscribed to bitcoind/coin about new transaction (with value and address)
+func (s *SocketIoServer) OnNewTxCoin(txid string, value big.Int, desc bchain.AddressDescriptor) {
+	addr, searchable, err := s.chainParser.GetAddressesFromAddrDesc(desc)
+	if err != nil {
+		glog.Error("GetAddressesFromAddrDesc error ", err, " for descriptor ", desc)
+	} else if searchable && len(addr) == 1 {
+		data := map[string]interface{}{"address": addr[0], "value": value.Int64(), "txid": txid}
+		c := s.server.BroadcastTo("bitcoind/coin", "bitcoind/coin", data)
+		glog.Info("broadcasting coin to ", addr[0], " amount ", value.Int64(), " to ", c, " channels")
 	}
 }
 
