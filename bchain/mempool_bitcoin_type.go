@@ -39,6 +39,9 @@ func NewMempoolBitcoinType(chain BlockChain, workers int, subworkers int) *Mempo
 				}(j)
 			}
 			for txid := range m.chanTxid {
+				if m.OnNewTx != nil {
+					m.OnNewTx(txid)
+				}
 				io, ok := m.getTxAddrs(txid, chanInput, chanResult)
 				if !ok {
 					io = []addrIndex{}
@@ -95,6 +98,9 @@ func (m *MempoolBitcoinType) getTxAddrs(txid string, chanInput chan Outpoint, ch
 		}
 		if m.OnNewTxAddr != nil {
 			m.OnNewTxAddr(tx, addrDesc)
+		}
+		if m.OnNewTxCoin != nil {
+			m.OnNewTxCoin(tx, output.ValueSat, addrDesc)
 		}
 	}
 	dispatched := 0

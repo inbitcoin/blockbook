@@ -216,6 +216,18 @@ func (s *PublicServer) OnNewTxAddr(tx *bchain.Tx, desc bchain.AddressDescriptor)
 	s.websocket.OnNewTxAddr(tx, desc)
 }
 
+// OnNewTxCoin notifies users subscribed to bitcoind/addresstxid about new block
+func (s *PublicServer) OnNewTxCoin(tx *bchain.Tx, value big.Int, desc bchain.AddressDescriptor) {
+	s.socketio.OnNewTxCoin(tx.Txid, value, desc)
+	//s.websocket.OnNewTxAddr(tx, desc)
+}
+
+// OnNewTx notifies users subscribed to bitcoind/txid about new transaction
+func (s *PublicServer) OnNewTx(txid string) {
+	s.socketio.OnNewTx(txid)
+	//s.websocket.OnNewTx(txid)
+}
+
 func (s *PublicServer) txRedirect(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, joinURL(s.explorerURL, r.URL.Path), 302)
 	s.metrics.ExplorerViews.With(common.Labels{"action": "tx-redirect"}).Inc()

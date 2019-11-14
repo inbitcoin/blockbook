@@ -27,6 +27,8 @@ type BaseMempool struct {
 	txEntries    map[string]txEntry
 	addrDescToTx map[string][]Outpoint
 	OnNewTxAddr  OnNewTxAddrFunc
+	OnNewTxCoin  OnNewTxCoinFunc
+	OnNewTx      OnNewTxFunc
 }
 
 // GetTransactions returns slice of mempool transactions for given address
