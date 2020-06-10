@@ -6,9 +6,11 @@ RUN adduser --shell /bin/bash --disabled-login --gecos "user" ${USER}
 
 COPY build/*.deb /tmp/
 
-RUN apt-get update && \
+RUN echo 'deb http://ftp.debian.org/debian stretch-backports main' >> /etc/apt/sources.list && \
+    apt-get update && \
     apt-get install -y supervisor && \
     apt-get install -y /tmp/*.deb && \
+    apt-get -t stretch-backports install -y rocksdb-tools && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY supervisor.conf ${APP}/supervisor.conf
