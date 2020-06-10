@@ -7,7 +7,13 @@ ARGS ?=
 
 TARGETS=$(subst .json,, $(shell ls configs/coins))
 
-.PHONY: build build-debug test deb
+DOCKER_NS="registry.inbitcoin.it/inbitcoin"
+VERSION=$(shell jq -r '.version' configs/environ.json)
+SHA1=$(shell git rev-parse HEAD | cut -c 1-8)
+
+.PHONY: build build-debug test deb docker build-deb build-docker version help
+
+default: help
 
 build: .bin-image
 	docker run -t --rm -e PACKAGER=$(PACKAGER) -e UPDATE_VENDOR=$(UPDATE_VENDOR) -v "$(CURDIR):/src" -v "$(CURDIR)/build:/out" $(BIN_IMAGE) make build ARGS="$(ARGS)"
@@ -77,3 +83,25 @@ clean-bin-image:
 
 clean-deb-image:
 	- docker rmi $(DEB_IMAGE)
+
+docker: all-bitcoin build-docker
+
+build-deb: all-bitcoin
+
+build-docker:
+	docker build -t $(DOCKER_NS)/blockbook:$(VERSION)_$(SHA1) .
+
+version:
+	@echo $(VERSION)
+
+help:
+	@ echo "Usage: make [target]\n"
+	@ echo "Targets:"
+	@ echo " - docker:         builds a docker image of this project (warn: cleans cache each time)"
+	@ echo " - build-deb:      builds only debian packages"
+	@ echo " - build-docker:   builds only docker image"
+	@ echo " - version:        shows project version"
+	@ echo " - help:           shows this message"
+	@ echo ""
+	@ echo "Other upstream targets are available, here undocumented"
+	@ echo "\nDefault: help"
