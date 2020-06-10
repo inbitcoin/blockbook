@@ -1,10 +1,6 @@
 package server
 
 import (
-	"blockbook/api"
-	"blockbook/bchain"
-	"blockbook/common"
-	"blockbook/db"
 	"encoding/json"
 	"math/big"
 	"net/http"
@@ -18,6 +14,10 @@ import (
 	"github.com/golang/glog"
 	"github.com/gorilla/websocket"
 	"github.com/juju/errors"
+	"github.com/trezor/blockbook/api"
+	"github.com/trezor/blockbook/bchain"
+	"github.com/trezor/blockbook/common"
+	"github.com/trezor/blockbook/db"
 )
 
 const upgradeFailed = "Upgrade failed: "
@@ -684,11 +684,14 @@ func (s *WebsocketServer) subscribeAddresses(c *websocketChannel, addrDesc []bch
 func (s *WebsocketServer) unsubscribeAddresses(c *websocketChannel) (res interface{}, err error) {
 	s.addressSubscriptionsLock.Lock()
 	defer s.addressSubscriptionsLock.Unlock()
-	for _, sa := range s.addressSubscriptions {
+	for ads, sa := range s.addressSubscriptions {
 		for sc := range sa {
 			if sc == c {
 				delete(sa, c)
 			}
+		}
+		if len(sa) == 0 {
+			delete(s.addressSubscriptions, ads)
 		}
 	}
 	return &subscriptionResponse{false}, nil
@@ -717,11 +720,14 @@ func (s *WebsocketServer) subscribeFiatRates(c *websocketChannel, currency strin
 func (s *WebsocketServer) unsubscribeFiatRates(c *websocketChannel) (res interface{}, err error) {
 	s.fiatRatesSubscriptionsLock.Lock()
 	defer s.fiatRatesSubscriptionsLock.Unlock()
-	for _, sa := range s.fiatRatesSubscriptions {
+	for fr, sa := range s.fiatRatesSubscriptions {
 		for sc := range sa {
 			if sc == c {
 				delete(sa, c)
 			}
+		}
+		if len(sa) == 0 {
+			delete(s.fiatRatesSubscriptions, fr)
 		}
 	}
 	return &subscriptionResponse{false}, nil

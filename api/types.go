@@ -1,14 +1,15 @@
 package api
 
 import (
-	"blockbook/bchain"
-	"blockbook/common"
-	"blockbook/db"
 	"encoding/json"
 	"errors"
 	"math/big"
 	"sort"
 	"time"
+
+	"github.com/trezor/blockbook/bchain"
+	"github.com/trezor/blockbook/common"
+	"github.com/trezor/blockbook/db"
 )
 
 const maxUint32 = ^uint32(0)
@@ -174,6 +175,7 @@ type EthereumSpecific struct {
 	GasLimit *big.Int `json:"gasLimit"`
 	GasUsed  *big.Int `json:"gasUsed"`
 	GasPrice *Amount  `json:"gasPrice"`
+	Data     string   `json:"data,omitempty"`
 }
 
 // Tx holds information about a transaction
@@ -368,19 +370,19 @@ type Blocks struct {
 
 // BlockInfo contains extended block header data and a list of block txids
 type BlockInfo struct {
-	Hash          string      `json:"hash"`
-	Prev          string      `json:"previousBlockHash,omitempty"`
-	Next          string      `json:"nextBlockHash,omitempty"`
-	Height        uint32      `json:"height"`
-	Confirmations int         `json:"confirmations"`
-	Size          int         `json:"size"`
-	Time          int64       `json:"time,omitempty"`
-	Version       json.Number `json:"version"`
-	MerkleRoot    string      `json:"merkleRoot"`
-	Nonce         string      `json:"nonce"`
-	Bits          string      `json:"bits"`
-	Difficulty    string      `json:"difficulty"`
-	Txids         []string    `json:"tx,omitempty"`
+	Hash          string            `json:"hash"`
+	Prev          string            `json:"previousBlockHash,omitempty"`
+	Next          string            `json:"nextBlockHash,omitempty"`
+	Height        uint32            `json:"height"`
+	Confirmations int               `json:"confirmations"`
+	Size          int               `json:"size"`
+	Time          int64             `json:"time,omitempty"`
+	Version       common.JSONNumber `json:"version"`
+	MerkleRoot    string            `json:"merkleRoot"`
+	Nonce         string            `json:"nonce"`
+	Bits          string            `json:"bits"`
+	Difficulty    string            `json:"difficulty"`
+	Txids         []string          `json:"tx,omitempty"`
 }
 
 // Block contains information about block

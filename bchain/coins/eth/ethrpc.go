@@ -1,7 +1,6 @@
 package eth
 
 import (
-	"blockbook/bchain"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -17,6 +16,8 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/golang/glog"
 	"github.com/juju/errors"
+	"github.com/trezor/blockbook/bchain"
+	"github.com/trezor/blockbook/common"
 )
 
 // EthereumNet type specifies the type of ethereum network
@@ -571,8 +572,8 @@ func (b *EthereumRPC) GetBlockInfo(hash string) (*bchain.BlockInfo, error) {
 	}
 	return &bchain.BlockInfo{
 		BlockHeader: *bch,
-		Difficulty:  json.Number(head.Difficulty),
-		Nonce:       json.Number(head.Nonce),
+		Difficulty:  common.JSONNumber(head.Difficulty),
+		Nonce:       common.JSONNumber(head.Nonce),
 		Txids:       txs.Transactions,
 	}, nil
 }
