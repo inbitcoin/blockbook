@@ -19,4 +19,5 @@ WORKDIR ${APP}
 
 EXPOSE 9030 9130
 
+ENV DB_STATS_PERIOD=0
 CMD ["/usr/bin/supervisord", "-c", "/opt/coins/blockbook/bitcoin/supervisor.conf"]
