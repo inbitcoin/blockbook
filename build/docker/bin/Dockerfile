@@ -35,18 +35,30 @@ RUN strip /opt/rocksdb/ldb /opt/rocksdb/sst_dump && \
 # install build tools
 RUN go get github.com/gobuffalo/packr/...
 
-# download pre-loaded depencencies
 RUN \
     cleanup() { rm -rf $GOPATH/src/github.com/trezor ; } && \
-    trap cleanup EXIT && \
-    mkdir -p $GOPATH/src/github.com/trezor && \
-    cd $GOPATH/src/github.com/trezor && \
-    git clone https://github.com/trezor/blockbook.git && \
-    cd blockbook && \
-    env GO111MODULE=on go mod vendor && \
+    trap cleanup EXIT
+
+WORKDIR $GOPATH/src/github.com/trezor/blockbook
+
+COPY api api
+COPY bchain bchain
+COPY build build
+COPY common common
+COPY configs configs
+COPY contrib contrib
+COPY db db
+COPY docs docs
+COPY fiat fiat
+COPY server server
+COPY static static
+COPY tests tests
+COPY blockbook.go CONTRIBUTING.md COPYING go.mod go.sum Makefile README.md ./
+
+RUN env GO111MODULE=on go mod vendor && \
     cp -r vendor /build/vendor
 
-ADD Makefile /build/Makefile
+ADD build/docker/bin/Makefile /build/Makefile
 
 VOLUME /out
 
